@@ -84,11 +84,12 @@ const YourApp = () => {
 
 
   return (     
-    <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>      
-    <Text>
+    <View style={{ flex: 1, justifyContent: "center", alignItems: "center", margin: 25 }}>
+    <Text style={{ fontWeight: "bold" }}>
     Random Resturaunt Selector
     </Text>
-    <Text>
+    <Text style={{ marginBottom: 10 }}>
+        Choose your preferences then hit choose!
     </Text>
 
     <Text>            
@@ -116,11 +117,7 @@ const YourApp = () => {
       />
     <Text>            
      
-    </Text> 
-
-    <Text>            
-    Choose your preferences then hit choose!
-    </Text>   
+    </Text>
 
     <Button
     onPress = {() => { firestore()
@@ -154,13 +151,14 @@ const YourApp = () => {
 
     <Text>            
      You should eat at {placeID}!
-    </Text> 
-
+    </Text>
 
     <View
       style={{
         borderBottomColor: 'black',
         borderBottomWidth: 1,
+        alignSelf: 'stretch',
+        marginTop: 15
       }}
     />
 
