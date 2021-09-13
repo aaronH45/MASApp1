@@ -1,11 +1,12 @@
 import React, {useState, useEffect} from 'react'; 
-import { SafeAreaView, Text, View, Button, StyleSheet, TextInput } from 'react-native'; 
+import { SafeAreaView, Text, View, Button, StyleSheet, TextInput, PermissionsAndroid} from 'react-native'; 
 import Slider from '@react-native-community/slider';
 import app from '@react-native-firebase/app';
 import auth from '@react-native-firebase/auth';
 import database from '@react-native-firebase/database'
 import firestore from '@react-native-firebase/firestore';
 import SegmentedControlTab from "react-native-segmented-control-tab";
+import Geolocation from 'react-native-geolocation-service';
 
 const YourApp = () => {   
 
@@ -31,26 +32,16 @@ const YourApp = () => {
   const [numSelect, setnumSelect] = React.useState(1);
   // const [number, onChangeNumber] = React.useState(null);
 
+  const [lat, changeLat] = React.useState(0);
+  const [lon, changeLon] = React.useState(0);
+
 
   const [newPlace,setNewPlace] = useState('')
 
 
   useEffect( async () =>    {try{
-    // const palcesIDs = await firestore().collection('places').get().then( snapshot => {snapshot.forEach(doc => {setPlaceID(doc)})});
-
     const places = query(firestore().collection('places'), where("money", "==", "$"))
     console.log(places)
-    // await firestore().collection('places').get().then(snapshot => 
-    //   {snapshot.forEach(
-    //     doc => {
-    //             setPlace(doc.data())
-    //             setPlaceID(doc.id)
-    //             console.log(doc.data(), doc.id)
-    //             }
-    //   )}
-    //   );
-
-
   } catch (e) {
     console.log(e)
   }
@@ -80,6 +71,61 @@ const YourApp = () => {
 
 
 
+useEffect(async () => {
+    try {
+      const granted = await PermissionsAndroid.request(
+        PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION,
+        {
+          title: "App location Permission",
+          message:
+            "App needs access to your location " ,
+          buttonNeutral: "Ask Me Later",
+          buttonNegative: "Cancel",
+          buttonPositive: "OK"
+        }
+      );
+      if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+        console.log("You can use the location");
+      } else {
+        console.log("location permission denied");
+        console.log(granted)
+      }
+    } catch (err) {
+      console.warn(err);
+    } 
+
+    try {
+        Geolocation.getCurrentPosition(
+            (position) => {
+              // console.log(position['coords']['latitude'])
+              changeLat(position['coords']['latitude'])
+              changeLon(position['coords']['longitude'])
+              console.log(lat, lon); 
+            } )
+        } catch (err) {
+          console.warn(err);
+        }
+      
+  } ,[]
+  )
+
+
+  // useEffect(async () => {
+  //   if (hasLocationPermission) {
+  //       Geolocation.getCurrentPosition(
+  //           (position) => {
+  //             console.log(position);
+  //           },
+  //           (error) => {
+  //             // See error code charts below.
+  //             console.log(error.code, error.message);
+  //           },
+  //           { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+  //       );
+  //     }
+  //   }, []
+  //   )
+
 
 
 
@@ -87,7 +133,12 @@ const YourApp = () => {
     <View style={{ flex: 1, justifyContent: "center", alignItems: "center", margin: 25 }}>
     <Text style={{ fontWeight: "bold" }}>
     Random Resturaunt Selector
+
     </Text>
+        <Text >
+    Current Pos: {lat}, {lon}
+    </Text>
+
     <Text style={{ marginBottom: 10 }}>
         Choose your preferences then hit choose!
     </Text>
